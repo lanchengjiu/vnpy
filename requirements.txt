@@ -4,13 +4,12 @@ tzlocal==2.0.0
 PyQt5==5.14.1
 pyqtgraph
 qdarkstyle
-numpy==1.18.2
+numpy==1.19.3
 pandas
 matplotlib
 seaborn
 PyCryptodome==3.9.9
 rqdatac==2.9.38
-ta-lib==0.4.17
 ibapi
 deap
 pyzmq

@@ -1,5 +1,5 @@
 # flake8: noqa
-from vnpy.event import EventEngine
+from vnpy.event import EventEngine, Event
 
 from vnpy.trader.engine import MainEngine
 from vnpy.trader.ui import MainWindow, create_qapp
@@ -24,22 +24,24 @@ from vnpy_ctp import CtpGateway
 # from vnpy_ost import OstGateway
 # from vnpy_hft import GtjaGateway
 
-# from vnpy_ctastrategy import CtaStrategyApp
-# from vnpy_ctabacktester import CtaBacktesterApp
-# from vnpy_spreadtrading import SpreadTradingApp
-# from vnpy_algotrading import AlgoTradingApp
-# from vnpy_optionmaster import OptionMasterApp
-# from vnpy_portfoliostrategy import PortfolioStrategyApp
-# from vnpy_scripttrader import ScriptTraderApp
-# from vnpy_chartwizard import ChartWizardApp
-# from vnpy_rpcservice import RpcServiceApp
-# from vnpy_excelrtd import ExcelRtdApp
-# from vnpy_datamanager import DataManagerApp
-# from vnpy_datarecorder import DataRecorderApp
-# from vnpy_riskmanager import RiskManagerApp
-# from vnpy_webtrader import WebTraderApp
-# from vnpy_portfoliomanager import PortfolioManagerApp
-# from vnpy_paperaccount import PaperAccountApp
+from vnpy_ctastrategy import CtaStrategyApp  # CTA策略引擎
+from vnpy_ctabacktester import CtaBacktesterApp  # CTA策略回测
+# from vnpy_spreadtrading import SpreadTradingApp  # 价差套利交易
+# from vnpy_algotrading import AlgoTradingApp  # 算法交易
+# from vnpy_optionmaster import OptionMasterApp  # 期权波动率交易
+from vnpy_portfoliostrategy import PortfolioStrategyApp  # 多合约组合策略
+# from vnpy_scripttrader import ScriptTraderApp  # 脚本策略
+# from vnpy_chartwizard import ChartWizardApp  # K线图表
+# from vnpy_rpcservice import RpcServiceApp  # RPC服务
+# from vnpy_excelrtd import ExcelRtdApp  # ExcelRTD
+from vnpy_datamanager import DataManagerApp  # 历史数据管理
+# from vnpy_datarecorder import DataRecorderApp  # 行情记录
+from vnpy_riskmanager import RiskManagerApp  # 风险管理
+# from vnpy_webtrader import WebTraderApp  # Web服务
+# from vnpy_portfoliomanager import PortfolioManagerApp  # 投资组合管理
+# from vnpy_paperaccount import PaperAccountApp  # 本地模拟交易
+
+from 数据服务接口 import register as DataMsgRegister  # 数据中心推送
 
 
 def main():
@@ -61,7 +63,6 @@ def main():
     # main_engine.add_gateway(XtpGateway)
     # main_engine.add_gateway(ToraStockGateway)
     # main_engine.add_gateway(ToraOptionGateway)
-    # main_engine.add_gateway(OesGateway)
     # main_engine.add_gateway(ComstarGateway)
     # main_engine.add_gateway(IbGateway)
     # main_engine.add_gateway(TapGateway)
@@ -72,23 +73,29 @@ def main():
     # main_engine.add_gateway(NhFuturesGateway)
     # main_engine.add_gateway(NhStockGateway)
 
-    # main_engine.add_app(PaperAccountApp)
-    # main_engine.add_app(CtaStrategyApp)
-    # main_engine.add_app(CtaBacktesterApp)
-    # main_engine.add_app(SpreadTradingApp)
-    # main_engine.add_app(AlgoTradingApp)
-    # main_engine.add_app(OptionMasterApp)
-    # main_engine.add_app(PortfolioStrategyApp)
-    # main_engine.add_app(ScriptTraderApp)
-    # main_engine.add_app(ChartWizardApp)
-    # main_engine.add_app(RpcServiceApp)
-    # main_engine.add_app(ExcelRtdApp)
-    # main_engine.add_app(DataManagerApp)
-    # main_engine.add_app(DataRecorderApp)
-    # main_engine.add_app(RiskManagerApp)
-    # main_engine.add_app(WebTraderApp)
-    # main_engine.add_app(PortfolioManagerApp)
-    
+    # main_engine.add_app(PaperAccountApp)  # 本地模拟交易
+    main_engine.add_app(CtaStrategyApp)  # CTA策略引擎
+    main_engine.add_app(CtaBacktesterApp)  # CTA策略回测
+    # main_engine.add_app(SpreadTradingApp)  # 价差套利交易
+    # main_engine.add_app(AlgoTradingApp)  # 算法交易
+    # main_engine.add_app(OptionMasterApp)  # 期权波动率交易
+    main_engine.add_app(PortfolioStrategyApp)  # 多合约组合策略
+    # main_engine.add_app(ScriptTraderApp)  # 脚本策略
+    # main_engine.add_app(ChartWizardApp)  # K线图表
+    # main_engine.add_app(RpcServiceApp)  # RPC服务
+    # main_engine.add_app(ExcelRtdApp)  # ExcelRTD
+    main_engine.add_app(DataManagerApp)  # 历史数据管理
+    # main_engine.add_app(DataRecorderApp)  # 行情记录
+    main_engine.add_app(RiskManagerApp)  # 风险管理
+    # main_engine.add_app(WebTraderApp)  # Web服务
+    # main_engine.add_app(PortfolioManagerApp)  # 投资组合管理
+
+    def DataMsgCallBack(MsgTime):
+        event = Event('eDataMsg', MsgTime)
+        main_engine.event_engine.put(event)
+
+    DataMsgRegister(DataMsgCallBack, minute=True)  # 注册数据中心推送
+
     main_window = MainWindow(main_engine, event_engine)
     main_window.showMaximized()
 
